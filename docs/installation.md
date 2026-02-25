@@ -14,15 +14,15 @@
 ### Requirements
 
 | Dependency | Version |
-|------------|---------|
-| Python | ≥ 3.8 |
-| numpy | ≥ 1.21 |
-| scipy | ≥ 1.7 |
-| pyvista | ≥ 0.43 |
-| pyvistaqt | ≥ 0.11 |
-| qtpy | ≥ 2.0 |
-| PyQt5 | ≥ 5.15 |
-| matplotlib | ≥ 3.5 |
+| ---------- | ------- |
+| Python     | ≥ 3.8   |
+| numpy      | ≥ 1.21  |
+| scipy      | ≥ 1.7   |
+| pyvista    | ≥ 0.43  |
+| pyvistaqt  | ≥ 0.11  |
+| qtpy       | ≥ 2.0   |
+| PyQt5      | ≥ 5.15  |
+| matplotlib | ≥ 3.5   |
 
 ### Steps
 

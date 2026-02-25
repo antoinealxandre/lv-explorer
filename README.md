@@ -25,7 +25,7 @@ LV Explorer is a desktop application for interactive 3D visualization and quanti
 
 ## Screenshots
 
-> *(Add screenshots here)*
+> _(Add screenshots here)_
 
 ---
 

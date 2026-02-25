@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
+
 - PDF export per patient
 - DICOM import support
 - Probabilistic scar estimation (CT-only workflow)
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0-alpha] — 2026-02-25
 
 ### Added
+
 - Initial alpha release of LV Explorer
 - 3D interactive visualization of LV endo/epicardium meshes (PyVista / VTK)
 - Wall thickness maps (1–5 mm isocontours)
@@ -32,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Standalone Windows `.exe` build via PyInstaller
 
 ### Known Limitations
+
 - Windows 10/11 only for the `.exe` distribution
 - Requires LGE-MRI data for scar metrics (estimated fallback available)
 - No DICOM import — VTK mesh format only

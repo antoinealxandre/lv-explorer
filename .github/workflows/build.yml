@@ -3,11 +3,11 @@ name: Build Windows .exe
 on:
   push:
     tags:
-      - "v*"          # Trigger on version tags like v0.1.0
-  workflow_dispatch:  # Allow manual trigger from GitHub UI
+      - "v*" # Trigger on version tags like v0.1.0
+  workflow_dispatch: # Allow manual trigger from GitHub UI
 
 permissions:
-  contents: write   # Required to upload release assets
+  contents: write # Required to upload release assets
 
 jobs:
   build-windows:
