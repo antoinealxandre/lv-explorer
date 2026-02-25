@@ -20,6 +20,7 @@ a = Analysis(
         # Bundle all assets (3D bust model)
         (str(ROOT / "assets"), "assets"),
     ],
+    hookspath=[str(ROOT / "hooks")],  # Use our custom hooks
     hiddenimports=[
         # Standard library (commonly missed by PyInstaller)
         "unittest",
@@ -79,13 +80,12 @@ a = Analysis(
         # Optional dashboard dependency
         "lv_explorer.core.dashboard_manager",
     ],
-    hookspath=[],
+    hookspath=[str(ROOT / "hooks")],  # Use our custom hooks
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
         "tkinter",
         "test",
-        "unittest",
         "distutils",
     ],
     noarchive=False,
