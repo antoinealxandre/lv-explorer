@@ -1,0 +1,7 @@
+[
+  {
+    "name": "Python",
+    "extensions": ["*.py"],
+    "configuration": "./python-configuration.json"
+  }
+]

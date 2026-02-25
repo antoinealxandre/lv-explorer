@@ -1,0 +1,20 @@
+# DEPRECATED — use /requirements.txt at the repository root instead.
+# This file is kept for backwards compatibility only.
+#
+# LV Explorer - Dependencies
+# ============================
+
+# Core scientific computing
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Visualization
+pyvista>=0.43.0
+pyvistaqt>=0.11.0
+
+# Qt framework (via qtpy for compatibility)
+qtpy>=2.0.0
+PyQt5>=5.15.0
+
+# Optional but recommended
+matplotlib>=3.5.0

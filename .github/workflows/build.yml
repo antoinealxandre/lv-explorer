@@ -1,0 +1,89 @@
+name: Build Windows .exe
+
+on:
+  push:
+    tags:
+      - "v*"          # Trigger on version tags like v0.1.0
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write   # Required to upload release assets
+
+jobs:
+  build-windows:
+    name: Build — Windows x64
+    runs-on: windows-latest
+
+    steps:
+      # ----------------------------------------------------------------
+      # 1. Checkout
+      # ----------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------------------
+      # 2. Set up Python
+      # ----------------------------------------------------------------
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # ----------------------------------------------------------------
+      # 3. Install dependencies
+      # ----------------------------------------------------------------
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller pyinstaller-hooks-contrib
+
+      # ----------------------------------------------------------------
+      # 4. Build .exe with PyInstaller
+      # ----------------------------------------------------------------
+      - name: Build with PyInstaller
+        run: pyinstaller lv_explorer.spec --noconfirm
+
+      # ----------------------------------------------------------------
+      # 5. Create ZIP archive
+      # ----------------------------------------------------------------
+      - name: Create ZIP archive
+        run: |
+          $version = "${{ github.ref_name }}"
+          $zipName = "LVExplorer_${version}_win64.zip"
+          Compress-Archive -Path "dist\LVExplorer" -DestinationPath "dist\$zipName" -Force
+          echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      # ----------------------------------------------------------------
+      # 6. Upload as GitHub Release asset (only on tag push)
+      # ----------------------------------------------------------------
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ env.ZIP_NAME }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
+          body: |
+            ## LV Explorer ${{ github.ref_name }}
+
+            ### Installation
+            1. Download `${{ env.ZIP_NAME }}`
+            2. Extract the ZIP
+            3. Run `LVExplorer.exe`
+
+            No Python installation required.
+
+            See [CHANGELOG.md](CHANGELOG.md) for details.
+
+      # ----------------------------------------------------------------
+      # 7. Upload as workflow artifact (always, for manual runs)
+      # ----------------------------------------------------------------
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LVExplorer-win64
+          path: dist/${{ env.ZIP_NAME }}
+          retention-days: 30

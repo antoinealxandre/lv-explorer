@@ -1,0 +1,67 @@
+# ===========================
+#  LV Explorer — .gitignore
+# ===========================
+
+# --- Patient / medical data (GDPR / privacy) ---
+data/
+cohort_results/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+pip-wheel-metadata/
+MANIFEST
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# --- PyInstaller ---
+*.spec.bak
+dist/
+build/
+
+# --- IDEs ---
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb
+
+# --- mypy / linting ---
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# --- OS ---
+desktop.ini
+*.lnk
+
+# --- Temp / logs ---
+*.log
+*.tmp
+tmp/
+logs/
+
+# --- Large binary assets (keep .obj/.mtl, ignore duplicates) ---
+assets/human_bust - Copie.obj

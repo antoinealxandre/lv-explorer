@@ -1,0 +1,21 @@
+# LV Explorer — Python dependencies
+# ===================================
+# Install with: pip install -r requirements.txt
+
+# Core scientific computing
+numpy>=1.21.0
+scipy>=1.7.0
+
+# 3D visualization
+pyvista>=0.43.0
+pyvistaqt>=0.11.0
+
+# Qt framework (qtpy as compatibility shim)
+qtpy>=2.0.0
+PyQt5>=5.15.0
+
+# Plotting
+matplotlib>=3.5.0
+
+# ---- Optional (for building the .exe) ----
+# pyinstaller>=6.0
