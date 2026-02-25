@@ -766,30 +766,32 @@ class LVExplorerApp(QtWidgets.QMainWindow):
         overlay.setObjectName("view_overlay")
         overlay.setStyleSheet("""
             QFrame#view_overlay {
-                background-color: #f5f5f5;
-                border: 1px solid #c8c8c8;
-                border-radius: 8px;
+                background-color: white;
+                border: 1px solid #d0d0d0;
+                border-radius: 6px;
             }
         """)
+        overlay.setMaximumWidth(320)
         lay = QtWidgets.QVBoxLayout(overlay)
-        lay.setContentsMargins(6, 8, 6, 8)
-        lay.setSpacing(3)
+        lay.setContentsMargins(4, 6, 4, 6)
+        lay.setSpacing(2)
 
         BTN_STYLE = """
             QPushButton {
                 background: transparent; border: none;
-                border-radius: 5px; padding: 3px 0;
+                border-radius: 4px; padding: 3px 6px;
                 font-size: 11px; font-weight: 600;
-                color: #333; min-width: 50px; min-height: 26px;
+                color: #333; min-width: 40px; min-height: 24px;
             }
-            QPushButton:hover  { background: #1976D2; color: white; }
-            QPushButton:pressed { background: #0D47A1; color: white; }
+            QPushButton:hover  { background-color: #1976D2; color: white; }
+            QPushButton:pressed { background-color: #0D47A1; color: white; }
         """
-        SEP_STYLE = "QFrame { color: #d0d0d0; background: #d0d0d0; max-height: 1px; }"
+        SEP_STYLE = "QFrame { color: #d0d0d0; background: #d0d0d0; max-height: 1px; margin: 2px 0; }"
 
         lbl = QtWidgets.QLabel("Vue")
         lbl.setAlignment(QtCore.Qt.AlignCenter)
-        lbl.setStyleSheet("font-size: 10px; color: #888; background: transparent; border: none;")
+        lbl.setStyleSheet("font-size: 9px; color: #999; background: transparent; border: none; margin: 0;")
+        lbl.setMaximumHeight(14)
         lay.addWidget(lbl)
 
         sep = QtWidgets.QFrame()

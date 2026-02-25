@@ -49,17 +49,7 @@ class MetricsCatalog:
             description='Carte EPI distance (identique LV_topology View 1)'
         )
         
-        catalog['parietal_thickness'] = MetricDefinition(
-            id='parietal_thickness',
-            name='Parietal Thickness (EPI + ENDO)',
-            category='Topography',
-            compute_func='compute_wall_thickness',
-            scalar_name='Wall_Thickness',
-            cmap='hot',
-            clim=(0, 6),
-            unit='mm',
-            description='Épaisseur pariétale vraie — distance EPI + ENDO (ground truth pour classification)'
-        )
+        # Suppression de la carte d'épaisseur pariétale (endo+epi)
         
         catalog['ciaccio'] = MetricDefinition(
             id='ciaccio',
