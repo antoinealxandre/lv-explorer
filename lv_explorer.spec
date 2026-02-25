@@ -80,7 +80,6 @@ a = Analysis(
         # Optional dashboard dependency
         "lv_explorer.core.dashboard_manager",
     ],
-    hookspath=[str(ROOT / "hooks")],  # Use our custom hooks
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
