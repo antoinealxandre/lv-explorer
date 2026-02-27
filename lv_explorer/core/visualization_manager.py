@@ -403,76 +403,85 @@ class VisualizationManager:
         """
         self.plotter.subplot(*si)
         
-        if "Channel_Region" not in mesh.array_names:
-            self._add_tracked_mesh(si, mesh, "channels_fallback",
-                color="lightgrey", opacity=0.3, show_scalar_bar=False)
-            return
-        
+        # Si l'utilisateur a demandé une mise en évidence d'épaisseur cible,
+        # afficher un dégradé blanc->rouge basé sur `Channel_Target_Display`.
         try:
-            from matplotlib.colors import LinearSegmentedColormap, ListedColormap
             import numpy as np
-            
+            from matplotlib.colors import LinearSegmentedColormap
+
+            if "Channel_Target_Display" in mesh.array_names:
+                # Affichage ciblé : enlever la couche fantôme translucide
+                # et utiliser un dégradé blanc→blanc→rouge concentré près de 1.0.
+                # Le rendu principal reste la couche Target (0→1).
+
+                # Colormap : blanc jusqu'à 0.80, légère montée puis rouge vif à 1.0
+                cmap = LinearSegmentedColormap.from_list(
+                    'white_to_red_sharp',
+                    [
+                        (0.0, '#ffffff'),
+                        (0.70, "#ffffff"),
+                        (0.80, "#f75c5c"),
+                        (0.95, "#FF0800"),
+                        (1.00, "#000000"),
+                    ]
+                )
+
+                sbar = {
+                    'title': 'Target (mm)',
+                    'color': 'black',
+                    'n_labels': 5,
+                    'vertical': True,
+                    'title_font_size': 12,
+                    'label_font_size': 10,
+                    'position_x': 0.85,
+                    'position_y': 0.12,
+                }
+
+                self._add_tracked_mesh(si, mesh, "channels_target",
+                    scalars="Channel_Target_Display",
+                    cmap=cmap,
+                    clim=[0.0, 1.0],
+                    opacity=1.0,
+                    scalar_bar_args=sbar,
+                    show_scalar_bar=True)
+
+                # Annoter la valeur cible si disponible
+                if 'channel_target' in mesh.field_data:
+                    try:
+                        tgt = float(mesh.field_data['channel_target'][0])
+                        key = self._view_key(si)
+                        self.plotter.add_text(
+                            f"Target: {tgt:.1f} mm",
+                            position='upper_right', font_size=9,
+                            color='black', name=f"{key}_ch_target_info")
+                        if key not in self.view_actors:
+                            self.view_actors[key] = []
+                        self.view_actors[key].append(f"{key}_ch_target_info")
+                    except Exception:
+                        pass
+                return
+
+            # Fallback: render simple channels (no border)
+            if "Channel_Region" not in mesh.array_names:
+                self._add_tracked_mesh(si, mesh, "channels_fallback",
+                    color="lightgrey", opacity=0.3, show_scalar_bar=False)
+                return
+
             region = mesh["Channel_Region"]
             wt = mesh["Wall_Thickness"]
-            
-            # Créer un champ d'affichage unique :
-            # Region 0 (rest): valeur -1.5 (gris clair)
-            # Region 1 (channels): valeur Wall_Thickness 0-5mm (colormap symétrique)
-            # Region 2 (border): valeur 6.5 (orange)
+
             display = np.zeros(len(region), dtype=float)
-            display[region == 0] = -1.5  # rest
+            display[region == 0] = -1.0  # rest
             display[region == 1] = wt[region == 1]  # channels
-            display[region == 2] = 6.5  # border
-            
             mesh["Channel_Display"] = display
-            
-            # Colormap combinée : gris | symétrique | orange
-            # Plage [-1.5, 6.5] : -1.5=rest, [0-5]=channels, 6.5=border
-            colors_combined = [
-                (-1.5, '#e0e0e0'),  # rest: gris clair
-                (-0.1, '#e0e0e0'),  # transition
-                (0.0,  '#2166ac'),  # 0mm : bleu foncé
-                (0.75, '#4393c3'),  # bleu moyen
-                (1.5,  '#92c5de'),  # bleu clair
-                (2.0,  '#f4a582'),  # orange clair
-                (2.5,  '#d73027'),  # 2.5mm : ROUGE vif
-                (3.0,  '#f4a582'),  # orange clair
-                (3.5,  '#92c5de'),  # bleu clair
-                (4.25, '#4393c3'),  # bleu moyen
-                (5.0,  '#2166ac'),  # 5mm : bleu foncé
-                (5.1,  '#2166ac'),  # transition
-                (6.5,  '#ff9800'),  # border: orange
-            ]
-            
-            # Normaliser positions [0, 1]
-            min_val, max_val = -1.5, 6.5
-            norm_colors = [
-                ((val - min_val) / (max_val - min_val), col)
-                for val, col in colors_combined
-            ]
-            
-            combined_cmap = LinearSegmentedColormap.from_list(
-                'channel_combined',
-                norm_colors,
-                N=512
-            )
-            
-            sbar = {
-                'title': 'Channels (mm)',
-                'color': 'black',
-                'n_labels': 6,
-                'vertical': True,
-                'title_font_size': 10,
-                'label_font_size': 8
-            }
-            
-            self._add_tracked_mesh(si, mesh, "channels",
-                scalars="Channel_Display",
-                cmap=combined_cmap,
-                clim=[-1.5, 6.5],
-                opacity=1.0,
-                scalar_bar_args=sbar,
-                show_scalar_bar=True)
+
+            # Simple colormap: gris pour le reste, bleu->red sur [0,5]
+            colors_combined = [(-1.0, '#e0e0e0'), (0.0, '#2166ac'), (2.5, '#d73027'), (5.0, '#2166ac')]
+            min_val, max_val = -1.0, 5.0
+            norm_colors = [((val - min_val) / (max_val - min_val), col) for val, col in colors_combined]
+            combined_cmap = LinearSegmentedColormap.from_list('channel_combined', norm_colors, N=512)
+            sbar = {'title': 'Channels (mm)', 'color': 'black', 'n_labels': 6, 'vertical': True, 'title_font_size': 10, 'label_font_size': 8}
+            self._add_tracked_mesh(si, mesh, "channels", scalars="Channel_Display", cmap=combined_cmap, clim=[min_val, max_val], opacity=1.0, scalar_bar_args=sbar, show_scalar_bar=True)
         except Exception:
             pass
     

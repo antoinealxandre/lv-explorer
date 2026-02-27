@@ -77,6 +77,7 @@ class DataManager:
         
         file_patterns = {
             'lv_epi_dist': '*LV EPI DIST MAP*.vtk',
+            # 'lv_epi_dist': '*LV ENDO DIST MAP*.vtk',
             'lv_endo_dist': '*LV ENDO DIST MAP*.vtk',
             'dense_scar': '*DENSE SCAR*.vtk',
             'scar': '*SCAR (LE)*.vtk',
@@ -288,43 +289,77 @@ class DataManager:
         
         return mesh
     
-    def compute_channels(self, border_radius: float = 10.0) -> Optional[pv.PolyData]:
-        """Canaux de conduction (0-5mm) avec zone bordante ajustable"""
+    def compute_channels(self, target_thickness: float = None) -> Optional[pv.PolyData]:
+        """Canaux de conduction (0-5mm).
+
+        Optionnellement calcule un champ `Channel_Target_Display` centré
+        sur `target_thickness` (mm) pour mise en évidence par un gradient
+        rouge symétrique autour de l'épaisseur cible.
+        """
         
         if 'wall_thickness' not in self.computed_metrics:
             self.compute_wall_thickness()
         
         mesh = self.computed_metrics['wall_thickness'].copy()
-        T = mesh["Wall_Thickness"]
+        T = mesh["Wall_Thickness"].astype(float)
         pts = mesh.points
-        
+
         # Canaux : épaisseur entre 0 et 5mm
         channel_mask = (T <= 5.0).astype(bool)
-        
-        # Zone bordante : points à ≤ border_radius mm des canaux mais pas dans les canaux
-        border_mask = np.zeros(len(T), dtype=bool)
-        channel_ids = np.where(channel_mask)[0]
-        
-        if len(channel_ids) > 0 and border_radius > 0:
-            tree = cKDTree(pts)
-            channel_pts = pts[channel_ids]
-            neighbors_sets = tree.query_ball_point(channel_pts, r=border_radius)
-            border_ids = set()
-            for nbrs in neighbors_sets:
-                border_ids.update(nbrs)
-            border_ids -= set(channel_ids.tolist())
-            if border_ids:
-                border_mask[list(border_ids)] = True
-        
-        # Channel_Region : 0 = ni canal ni bordure, 1 = canal, 2 = zone bordante
+
+        # Region simplifiée : 0 = reste, 1 = canal
         region = np.zeros(len(T), dtype=float)
         region[channel_mask] = 1.0
-        region[border_mask] = 2.0
-        
+
         mesh["Channel_Zone"] = channel_mask.astype(float)
-        mesh["Channel_Border"] = border_mask.astype(float)
         mesh["Channel_Region"] = region
         mesh["Channel_Score"] = np.where(channel_mask, 1 - (np.abs(T - 2.5) / 2.5), 0)
+
+        # --- Target thickness display (highlight centered on target_thickness) ---
+        # Si `target_thickness` fourni, construire un champ [0,1] où 1 = épaisseur cible
+        # et décroît symétriquement vers 0. On utilise une tolérance douce pour
+        # créer un dégradé (tolérance par défaut 0.5 mm).
+        if target_thickness is not None:
+            tol = 0.5  # mm, demi-largeur de la bande de mise en évidence
+            diff = np.abs(T - float(target_thickness))
+            intensity = np.clip(1.0 - diff / tol, 0.0, 1.0)
+            mesh["Channel_Target_Display"] = intensity.astype(float)
+            try:
+                mesh.field_data['channel_target'] = np.array([float(target_thickness)])
+            except Exception:
+                pass
+
+        self.computed_metrics['channels'] = mesh
+        return mesh
+
+    def update_channel_target(self, target_thickness: float, tol: float = 0.5) -> Optional[pv.PolyData]:
+        """Met à jour en place le champ `Channel_Target_Display` pour les channels existants.
+
+        Retourne le mesh mis à jour ou None si channels non calculés.
+        """
+        if 'channels' not in self.computed_metrics:
+            return None
+
+        mesh = self.computed_metrics['channels']
+        if 'Wall_Thickness' not in mesh.array_names:
+            return None
+
+        T = mesh['Wall_Thickness'].astype(float)
+        diff = np.abs(T - float(target_thickness))
+        intensity = np.clip(1.0 - diff / float(tol), 0.0, 1.0)
+
+        # Remplacer ou créer le tableau en place
+        try:
+            mesh.point_data['Channel_Target_Display'] = intensity.astype(float)
+        except Exception:
+            mesh['Channel_Target_Display'] = intensity.astype(float)
+
+        try:
+            mesh.field_data['channel_target'] = np.array([float(target_thickness)])
+        except Exception:
+            pass
+
+        return mesh
         
         self.computed_metrics['channels'] = mesh
         

@@ -362,30 +362,30 @@ class LVExplorerApp(QtWidgets.QMainWindow):
         self.dz_group.setVisible(False)  # Initialement caché
         layout.addWidget(self.dz_group)
 
-        # === 4c. BORDER RADIUS SLIDER (visible uniquement pour Channels) ===
-        self.border_group = QtWidgets.QGroupBox("Border Zone Radius")
-        border_layout = QtWidgets.QVBoxLayout()
-        
-        self.border_label = QtWidgets.QLabel("Radius: 10.0 mm")
-        self.border_label.setStyleSheet("font-size: 13px; font-weight: bold;")
-        border_layout.addWidget(self.border_label)
-        
-        self.border_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.border_slider.setMinimum(0)     # 0 mm
-        self.border_slider.setMaximum(50)    # 50 mm
-        self.border_slider.setValue(10)      # 10 mm par défaut
-        self.border_slider.setTickInterval(5)
-        self.border_slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
-        self.border_slider.valueChanged.connect(self._on_border_radius_changed)
-        border_layout.addWidget(self.border_slider)
-        
-        border_hint = QtWidgets.QLabel("Distance autour des canaux (0-5mm zone)")
-        border_hint.setStyleSheet("font-size: 11px; color: #888;")
-        border_layout.addWidget(border_hint)
-        
-        self.border_group.setLayout(border_layout)
-        self.border_group.setVisible(False)
-        layout.addWidget(self.border_group)
+        # === 4c. TARGET THICKNESS SLIDER (visible uniquement pour Channels) ===
+        self.channel_target_group = QtWidgets.QGroupBox("Target Thickness Highlight")
+        target_layout = QtWidgets.QVBoxLayout()
+
+        self.channel_target_label = QtWidgets.QLabel("Target: 2.0 mm")
+        self.channel_target_label.setStyleSheet("font-size: 13px; font-weight: bold;")
+        target_layout.addWidget(self.channel_target_label)
+
+        self.channel_target_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.channel_target_slider.setMinimum(5)    # 0.5 mm (×10)
+        self.channel_target_slider.setMaximum(150)  # 15.0 mm (×10)
+        self.channel_target_slider.setValue(20)     # 2.0 mm par défaut (×10)
+        self.channel_target_slider.setTickInterval(5)
+        self.channel_target_slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.channel_target_slider.valueChanged.connect(self._on_channel_target_changed)
+        target_layout.addWidget(self.channel_target_slider)
+
+        target_hint = QtWidgets.QLabel("Choisir une épaisseur cible à mettre en évidence (dégradé blanc→rouge)")
+        target_hint.setStyleSheet("font-size: 11px; color: #888;")
+        target_layout.addWidget(target_hint)
+
+        self.channel_target_group.setLayout(target_layout)
+        self.channel_target_group.setVisible(False)
+        layout.addWidget(self.channel_target_group)
 
         # === 4d. LAPLACIAN THRESHOLD SLIDER + SURFACE FILTER ===
         self.lap_group = QtWidgets.QGroupBox("Laplacian")
@@ -743,7 +743,7 @@ class LVExplorerApp(QtWidgets.QMainWindow):
             for category, metric_ids in self.catalog.categories.items():
                 for metric_id in metric_ids:
                     metric = self.catalog.get_metric(metric_id)
-                    combo.addItem(f"{category}: {metric.name}", metric_id)
+                    combo.addItem(metric.name, metric_id)
             
             # Restaurer la sélection si elle existait
             if i in old_selections and old_selections[i] is not None:
@@ -766,36 +766,27 @@ class LVExplorerApp(QtWidgets.QMainWindow):
         overlay.setObjectName("view_overlay")
         overlay.setStyleSheet("""
             QFrame#view_overlay {
-                background-color: #f5f5f5;
-                border: 1px solid #c8c8c8;
-                border-radius: 8px;
+                background-color: white;
+                border: 1px solid #d0d0d0;
+                border-radius: 6px;
             }
         """)
+        overlay.setMaximumWidth(320)
         lay = QtWidgets.QVBoxLayout(overlay)
-        lay.setContentsMargins(6, 8, 6, 8)
-        lay.setSpacing(3)
+        lay.setContentsMargins(4, 6, 4, 6)
+        lay.setSpacing(2)
 
         BTN_STYLE = """
             QPushButton {
                 background: transparent; border: none;
-                border-radius: 5px; padding: 3px 0;
+                border-radius: 18px; padding: 6px 10px;
                 font-size: 11px; font-weight: 600;
-                color: #333; min-width: 50px; min-height: 26px;
+                color: #333; min-width: 36px; min-height: 36px;
             }
-            QPushButton:hover  { background: #1976D2; color: white; }
-            QPushButton:pressed { background: #0D47A1; color: white; }
+            QPushButton:hover  { background-color: #1976D2; color: white; }
+            QPushButton:pressed { background-color: #0D47A1; color: white; }
         """
-        SEP_STYLE = "QFrame { color: #d0d0d0; background: #d0d0d0; max-height: 1px; }"
-
-        lbl = QtWidgets.QLabel("Vue")
-        lbl.setAlignment(QtCore.Qt.AlignCenter)
-        lbl.setStyleSheet("font-size: 10px; color: #888; background: transparent; border: none;")
-        lay.addWidget(lbl)
-
-        sep = QtWidgets.QFrame()
-        sep.setFrameShape(QtWidgets.QFrame.HLine)
-        sep.setStyleSheet(SEP_STYLE)
-        lay.addWidget(sep)
+        SEP_STYLE = "QFrame { color: #d0d0d0; background: #d0d0d0; max-height: 1px; margin: 2px 0; }"
 
         views = [
             ("AP",  "anterior",  "Antéro-postérieure"),
@@ -814,16 +805,7 @@ class LVExplorerApp(QtWidgets.QMainWindow):
             btn.clicked.connect(lambda _c, vt=vtype: self._set_all_views(vt))
             lay.addWidget(btn)
 
-        sep2 = QtWidgets.QFrame()
-        sep2.setFrameShape(QtWidgets.QFrame.HLine)
-        sep2.setStyleSheet(SEP_STYLE)
-        lay.addWidget(sep2)
-
-        reset_btn = QtWidgets.QPushButton("↺")
-        reset_btn.setToolTip("Réinitialiser (vue antérieure)")
-        reset_btn.setStyleSheet(BTN_STYLE)
-        reset_btn.clicked.connect(self._on_reset_camera)
-        lay.addWidget(reset_btn)
+        # removed reset button and extra separator — only view buttons shown
 
         # Positionnement initial + event filter pour le suivi de resize
         overlay.adjustSize()
@@ -1239,8 +1221,8 @@ class LVExplorerApp(QtWidgets.QMainWindow):
                 else:
                     mesh = compute_method(pacing_site='SR', scar_decay=decay)
             elif metric_id == 'channels':
-                border_radius = self.border_slider.value()
-                mesh = compute_method(border_radius=border_radius)
+                target = self.channel_target_slider.value() / 10.0
+                mesh = compute_method(target_thickness=target)
             elif metric_id == 'border_zone_cedilnik':
                 dilation_radius = self.cedilnik_slider.value() / 2.0
                 mesh = compute_method(dilation_radius=dilation_radius)
@@ -1334,7 +1316,7 @@ class LVExplorerApp(QtWidgets.QMainWindow):
             combo.currentData() == 'channels'
             for combo in self.view_combos.values()
         )
-        self.border_group.setVisible(has_channels)
+        self.channel_target_group.setVisible(has_channels)
         
         # Afficher/masquer le slider Laplacian
         has_lap = any(
@@ -1434,33 +1416,34 @@ class LVExplorerApp(QtWidgets.QMainWindow):
             pass
 
     def _on_border_radius_changed(self, value):
-        """Callback : Le slider border radius a changé — re-rendre toutes les vues channels"""
-        self.border_label.setText(f"Radius: {value:.0f} mm")
-        
+        """Deprecated border callback placeholder."""
+        return
+
+    def _on_channel_target_changed(self, value):
+        """Callback : Le slider target thickness a changé — re-rendre toutes les vues channels"""
+        target = value / 10.0
+        self.channel_target_label.setText(f"Target: {target:.1f} mm")
+
         if not self.data_manager:
             return
-        
+
         try:
+            # Mise à jour en place pour éviter le clignotement : modifier l'array
+            # existant puis mettre à jour la colorbar/clim et re-render unique.
+            updated = self.data_manager.update_channel_target(float(target))
             rows, cols = self._grid_shape
             for view_idx, combo in self.view_combos.items():
                 metric_id = combo.currentData()
                 if metric_id == 'channels':
                     i = view_idx // cols
                     j = view_idx % cols
-                    
                     if i >= rows or j >= cols:
                         continue
-                    
-                    metric_def = self.catalog.get_metric(metric_id)
-                    mesh = self.data_manager.compute_channels(border_radius=float(value))
-                    
-                    if mesh is None:
-                        continue
-                    
-                    self.viz_manager.render_metric((i, j), mesh, metric_def)
-            
+                    # S'assurer que l'acteur est configuré pour [0,1]
+                    self.viz_manager.set_clim_on_actors((i, j), (0.0, 1.0))
+
+            # Un seul rendu pour actualiser l'affichage (pas de suppression/recréation)
             self.plotter.render()
-        
         except Exception:
             pass
     
