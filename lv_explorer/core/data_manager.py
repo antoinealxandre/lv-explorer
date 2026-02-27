@@ -77,6 +77,7 @@ class DataManager:
         
         file_patterns = {
             'lv_epi_dist': '*LV EPI DIST MAP*.vtk',
+            # 'lv_epi_dist': '*LV ENDO DIST MAP*.vtk',
             'lv_endo_dist': '*LV ENDO DIST MAP*.vtk',
             'dense_scar': '*DENSE SCAR*.vtk',
             'scar': '*SCAR (LE)*.vtk',

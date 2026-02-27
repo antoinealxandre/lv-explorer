@@ -743,7 +743,7 @@ class LVExplorerApp(QtWidgets.QMainWindow):
             for category, metric_ids in self.catalog.categories.items():
                 for metric_id in metric_ids:
                     metric = self.catalog.get_metric(metric_id)
-                    combo.addItem(f"{category}: {metric.name}", metric_id)
+                    combo.addItem(metric.name, metric_id)
             
             # Restaurer la sélection si elle existait
             if i in old_selections and old_selections[i] is not None:
@@ -779,25 +779,14 @@ class LVExplorerApp(QtWidgets.QMainWindow):
         BTN_STYLE = """
             QPushButton {
                 background: transparent; border: none;
-                border-radius: 4px; padding: 3px 6px;
+                border-radius: 18px; padding: 6px 10px;
                 font-size: 11px; font-weight: 600;
-                color: #333; min-width: 40px; min-height: 24px;
+                color: #333; min-width: 36px; min-height: 36px;
             }
             QPushButton:hover  { background-color: #1976D2; color: white; }
             QPushButton:pressed { background-color: #0D47A1; color: white; }
         """
         SEP_STYLE = "QFrame { color: #d0d0d0; background: #d0d0d0; max-height: 1px; margin: 2px 0; }"
-
-        lbl = QtWidgets.QLabel("Vue")
-        lbl.setAlignment(QtCore.Qt.AlignCenter)
-        lbl.setStyleSheet("font-size: 9px; color: #999; background: transparent; border: none; margin: 0;")
-        lbl.setMaximumHeight(14)
-        lay.addWidget(lbl)
-
-        sep = QtWidgets.QFrame()
-        sep.setFrameShape(QtWidgets.QFrame.HLine)
-        sep.setStyleSheet(SEP_STYLE)
-        lay.addWidget(sep)
 
         views = [
             ("AP",  "anterior",  "Antéro-postérieure"),
@@ -816,16 +805,7 @@ class LVExplorerApp(QtWidgets.QMainWindow):
             btn.clicked.connect(lambda _c, vt=vtype: self._set_all_views(vt))
             lay.addWidget(btn)
 
-        sep2 = QtWidgets.QFrame()
-        sep2.setFrameShape(QtWidgets.QFrame.HLine)
-        sep2.setStyleSheet(SEP_STYLE)
-        lay.addWidget(sep2)
-
-        reset_btn = QtWidgets.QPushButton("↺")
-        reset_btn.setToolTip("Réinitialiser (vue antérieure)")
-        reset_btn.setStyleSheet(BTN_STYLE)
-        reset_btn.clicked.connect(self._on_reset_camera)
-        lay.addWidget(reset_btn)
+        # removed reset button and extra separator — only view buttons shown
 
         # Positionnement initial + event filter pour le suivi de resize
         overlay.adjustSize()
