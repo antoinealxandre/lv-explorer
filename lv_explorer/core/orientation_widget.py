@@ -98,7 +98,7 @@ def create_human_bust_prop():
                             -center_z * actor.GetScale()[2])
             
             assembly.AddPart(actor)
-            print(f"✓ Loaded human bust from {obj_path}")
+            
             
         except Exception as e:
             print(f"⚠ Error loading {obj_path}: {e}")
