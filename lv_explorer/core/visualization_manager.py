@@ -558,7 +558,7 @@ class VisualizationManager:
             mesh = mesh.copy()
             mesh["Laplacian_Category"] = category.astype(float)
 
-            lap_cmap = ListedColormap(['#d0d0d0', '#2166ac', '#d73027'])
+            lap_cmap = ListedColormap(['#d0d0d0', '#d73027', '#2166ac'])
             sbar = {
                 'title': 'Laplacian',
                 'color': 'black',

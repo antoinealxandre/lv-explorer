@@ -36,9 +36,14 @@ class DataManager:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _clip_annular_rings(mesh: pv.PolyData, threshold: float = 0.5) -> pv.PolyData:
+    def _clip_annular_rings(mesh: pv.PolyData, threshold: float = 0.5,
+                            dilation: int = 2) -> pv.PolyData:
         """Retire les anneaux mitral/aortique (dist EPI < threshold) du mesh EPI DIST MAP.
-        Conserve uniquement la plus grande composante connexe."""
+
+        La zone retirée est élargie de `dilation` rangées de voisins afin de
+        gratter un peu plus de rayon autour de l'anneau, puis on ne conserve que
+        la plus grande composante connexe — ce qui élimine au passage les îlots
+        résiduels parfois laissés au centre de l'anneau."""
         if mesh.active_scalars is None or mesh.n_points == 0:
             return mesh
 
@@ -51,10 +56,28 @@ class DataManager:
             return mesh
 
         faces = mesh.regular_faces  # (n_cells, 3)
-        keep_mask = np.array([
-            not (int(f[0]) in near_zero_pts or int(f[1]) in near_zero_pts or int(f[2]) in near_zero_pts)
-            for f in faces
-        ])
+
+        # Dilatation : tout point appartenant à une face qui touche déjà la zone
+        # annulaire est ajouté à la sélection. En répétant, on élargit le rayon
+        # retiré de quelques rangées de triangles autour de l'anneau.
+        for _ in range(max(0, dilation)):
+            sel = np.fromiter(near_zero_pts, dtype=int)
+            touching = (
+                np.isin(faces[:, 0], sel) |
+                np.isin(faces[:, 1], sel) |
+                np.isin(faces[:, 2], sel)
+            )
+            grown = np.unique(faces[touching].ravel())
+            if len(grown) == len(near_zero_pts):
+                break
+            near_zero_pts.update(int(i) for i in grown)
+
+        sel = np.fromiter(near_zero_pts, dtype=int)
+        keep_mask = ~(
+            np.isin(faces[:, 0], sel) |
+            np.isin(faces[:, 1], sel) |
+            np.isin(faces[:, 2], sel)
+        )
 
         clean_indices = np.where(keep_mask)[0]
         if len(clean_indices) == 0:
@@ -1175,6 +1198,14 @@ class DataManager:
             'label': 'Canal étroit (WT 1-4mm)',
             'description': 'Zone WT entre 1 et 4mm — couloir de conduction critique',
         },
+        'wall_thickness': {
+            'label': 'Épaisseur de paroi (classique)',
+            'description': 'Carte d\'épaisseur pariétale — paroi fine = substrat',
+        },
+        'laplacian': {
+            'label': 'Laplacien (épaisseur)',
+            'description': 'Laplacien de l\'épaisseur — fortes variations locales de paroi',
+        },
         'ciaccio': {
             'label': 'Gradient (Ciaccio)',
             'description': 'Changement brutal d\'épaisseur — front d\'onde ralenti',
@@ -1269,6 +1300,11 @@ class DataManager:
                 self.compute_cv_map()
             except Exception:
                 pass
+        if 'laplacian' not in self.computed_metrics:
+            try:
+                self.compute_laplacian()
+            except Exception:
+                pass
 
         def _get_layer(metric_key: str) -> np.ndarray:
             """Extrait et normalise une couche [0, 1]."""
@@ -1276,6 +1312,17 @@ class DataManager:
             try:
                 if metric_key == 'narrow_channel':
                     arr = ((T >= 1.0) & (T <= 4.0)).astype(float)
+                elif metric_key == 'wall_thickness':
+                    # Carte d'épaisseur classique : paroi fine = substrat → score
+                    # élevé pour les parois amincies (inverse de l'épaisseur).
+                    p99 = np.percentile(T, 99) if T.max() > 0 else 1.0
+                    if p99 > 0:
+                        arr = np.clip(1.0 - T / p99, 0, 1)
+                elif metric_key == 'laplacian':
+                    if 'laplacian' in self.computed_metrics:
+                        lap = np.abs(self.computed_metrics['laplacian']["Laplacian"].astype(float))
+                        p99 = np.percentile(lap, 99) if lap.max() > 0 else 1.0
+                        arr = np.clip(lap / p99, 0, 1) if p99 > 0 else lap
                 elif metric_key == 'ciaccio':
                     if 'ciaccio_ratio' in self.computed_metrics:
                         rho = self.computed_metrics['ciaccio_ratio']["Ciaccio_Ratio"].astype(float)

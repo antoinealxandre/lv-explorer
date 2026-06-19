@@ -17,6 +17,10 @@ class CombinedScoreDialog(QtWidgets.QDialog):
     METRIC_ROWS = [
         ('narrow_channel',   'Canal étroit (WT 1-4mm)',
          'Zone WT entre 1 et 4mm — couloir de conduction critique\nCedilnik 2018, de Bakker 1993'),
+        ('wall_thickness',   'Épaisseur de paroi (classique)',
+         'Carte d\'épaisseur pariétale — paroi fine = substrat\nLV EPI DIST MAP'),
+        ('laplacian',        'Laplacien (épaisseur)',
+         'Laplacien de l\'épaisseur — fortes variations locales de paroi\nDivergence du gradient'),
         ('channelness',      'Channelness (Cedilnik)',
          'Score de channelness par simulation Eikonal\nCedilnik, EP-Europace 2018'),
         ('ciaccio',          'Gradient (Ciaccio)',
