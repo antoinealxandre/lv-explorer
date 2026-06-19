@@ -791,10 +791,10 @@ class LVExplorerApp(QtWidgets.QMainWindow):
         views = [
             ("AP",  "anterior",  "Antéro-postérieure"),
             ("PA",  "posterior", "Postéro-antérieure"),
-            ("LAO", "lao",       "Left Anterior Oblique (40°)"),
-            ("RAO", "rao",       "Right Anterior Oblique (40°)"),
-            ("LL",  "ll",        "Latérale gauche"),
-            ("RL",  "rl",        "Latérale droite"),
+            ("RAO", "lao",       "Right Anterior Oblique (40°)"),
+            ("LAO", "rao",       "Left Anterior Oblique (40°)"),
+            ("RL",  "ll",        "Latérale droite"),
+            ("LL",  "rl",        "Latérale gauche"),
             ("INF", "inferior",  "Vue inférieure (apex)"),
             ("SUP", "superior",  "Vue supérieure (base)"),
         ]
