@@ -13,7 +13,7 @@ Patient data is sourced from [inHEART](https://www.inheart.fr/) and exported in 
 ## Demo
 
 
-[![LV Explorer Demo](https://github.com/user-attachments/assets/7838bbb7-6a52-4d15-bd0d-805400ec794f)
+![LV Explorer Demo]([https://github.com/user-attachments/assets/7838bbb7-6a52-4d15-bd0d-805400ec794f](https://private-user-images.githubusercontent.com/188148970/613584460-7838bbb7-6a52-4d15-bd0d-805400ec794f.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODI0NjQ3OTcsIm5iZiI6MTc4MjQ2NDQ5NywicGF0aCI6Ii8xODgxNDg5NzAvNjEzNTg0NDYwLTc4MzhiYmI3LTZhNTItNGQxNS1iZDBkLTgwNTQwMGVjNzk0Zi5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwNjI2JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDYyNlQwOTAxMzdaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1iZmI5MzM3YzFlYjFmZmM3YmMyM2JhMjc2ZDc5ZGE0OTUyOTg0MGRhNWEwODAxZjUwM2ZhNDE2OGZmMjg3YzBiJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9dmlkZW8lMkZtcDQifQ.492s62HdEYAjxuSYoJbgSkbdW0Je-_F-hXj9syr2w88)
 
 > _3D interactive visualization of left ventricular geometry with scar overlay and bipolar voltage mapping._
 
