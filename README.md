@@ -12,9 +12,8 @@ Patient data is sourced from [inHEART](https://www.inheart.fr/) and exported in 
 
 ## Demo
 
-<!-- Replace with your actual demo video link -->
 
-[![LV Explorer Demo](https://img.shields.io/badge/▶_Watch_Demo-YouTube-red?style=for-the-badge&logo=youtube)](https://youtube.com/your-demo-link)
+[![LV Explorer Demo](https://github.com/user-attachments/assets/7838bbb7-6a52-4d15-bd0d-805400ec794f)
 
 > _3D interactive visualization of left ventricular geometry with scar overlay and bipolar voltage mapping._
 
